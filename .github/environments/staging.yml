@@ -1,0 +1,20 @@
+name: staging
+on:
+  workflow_run:
+    workflows: ["BamVoo CI/CD Pipeline"]
+    types: [completed]
+
+protection_rules:
+  required_reviewers:
+    users: []
+    teams: []
+  wait_timer:
+    minutes: 0
+  deployment_branch_policy:
+    protected_branches: false
+    custom_branch_policies: true
+    custom_branch_policies:
+      - name: develop
+        reviewers:
+          users: []
+          teams: [] 

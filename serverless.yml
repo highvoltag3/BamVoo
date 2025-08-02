@@ -1,0 +1,39 @@
+service: bamvoo
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1
+  environment:
+    OCTO_APP_TOKEN: ${env:OCTO_APP_TOKEN}
+    ALEXA_SKILL_ID: ${env:ALEXA_SKILL_ID}
+    ALEXA_ACCESS_TOKEN: ${env:ALEXA_ACCESS_TOKEN}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - logs:CreateLogGroup
+        - logs:CreateLogStream
+        - logs:PutLogEvents
+      Resource: "arn:aws:logs:*:*:*"
+
+functions:
+  alexaSkill:
+    handler: index.handler
+    events:
+      - alexaSkill:
+          appId: ${env:ALEXA_SKILL_ID}
+    timeout: 30
+    memorySize: 256
+
+  webhookHandler:
+    handler: webhook-handler.handler
+    events:
+      - http:
+          path: webhook
+          method: post
+          cors: true
+    timeout: 30
+    memorySize: 256
+
+plugins:
+  - serverless-alexa-skills 

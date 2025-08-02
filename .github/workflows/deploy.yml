@@ -1,0 +1,203 @@
+name: BamVoo CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch: # Allow manual triggers
+
+env:
+  NODE_VERSION: '18'
+  AWS_REGION: 'us-east-1'
+
+jobs:
+  test:
+    name: 🧪 Test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 📦 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        
+    - name: 📥 Install dependencies
+      run: npm ci
+      
+    - name: 🧪 Run local tests
+      run: npm run test:local
+      
+    - name: 🧪 Run unit tests
+      run: npm test
+      
+    - name: 📊 Upload test coverage
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage/lcov.info
+        flags: unittests
+        name: codecov-umbrella
+
+  security:
+    name: 🔒 Security Scan
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 📦 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        
+    - name: 📥 Install dependencies
+      run: npm ci
+      
+    - name: 🔒 Run security audit
+      run: npm audit --audit-level=high
+      
+    - name: 🔒 Run Snyk security scan
+      uses: snyk/actions/node@master
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      with:
+        args: --severity-threshold=high
+
+  build:
+    name: 🏗️ Build
+    runs-on: ubuntu-latest
+    needs: [test, security]
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 📦 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        
+    - name: 📥 Install dependencies
+      run: npm ci
+      
+    - name: 🏗️ Build package
+      run: |
+        npm run build
+        zip -r bamvoo.zip . -x "node_modules/*" ".git/*" "test/*" "*.md" ".github/*"
+        
+    - name: 📦 Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: bamvoo-build
+        path: bamvoo.zip
+
+  deploy-staging:
+    name: 🚀 Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/develop'
+    environment: staging
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 📦 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        
+    - name: 📥 Install dependencies
+      run: npm ci
+      
+    - name: 📥 Install Serverless Framework
+      run: npm install -g serverless
+      
+    - name: 🔐 Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+        
+    - name: 🚀 Deploy to staging
+      env:
+        OCTO_APP_TOKEN: ${{ secrets.OCTO_APP_TOKEN }}
+        ALEXA_SKILL_ID: ${{ secrets.ALEXA_SKILL_ID_STAGING }}
+        ALEXA_ACCESS_TOKEN: ${{ secrets.ALEXA_ACCESS_TOKEN_STAGING }}
+      run: |
+        serverless deploy --stage staging --verbose
+        
+    - name: 📊 Deploy status
+      run: |
+        echo "✅ Staging deployment completed"
+        echo "🔗 Lambda ARN: $(aws lambda get-function --function-name bamvoo-staging-alexaSkill --query 'Configuration.FunctionArn' --output text)"
+        echo "🔗 API Gateway: https://$(aws apigateway get-rest-apis --query 'items[?name==`bamvoo-staging`].id' --output text).execute-api.us-east-1.amazonaws.com/staging"
+
+  deploy-production:
+    name: 🚀 Deploy to Production
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    environment: production
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 📦 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        
+    - name: 📥 Install dependencies
+      run: npm ci
+      
+    - name: 📥 Install Serverless Framework
+      run: npm install -g serverless
+      
+    - name: 🔐 Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+        
+    - name: 🚀 Deploy to production
+      env:
+        OCTO_APP_TOKEN: ${{ secrets.OCTO_APP_TOKEN }}
+        ALEXA_SKILL_ID: ${{ secrets.ALEXA_SKILL_ID_PROD }}
+        ALEXA_ACCESS_TOKEN: ${{ secrets.ALEXA_ACCESS_TOKEN_PROD }}
+      run: |
+        serverless deploy --stage prod --verbose
+        
+    - name: 📊 Deploy status
+      run: |
+        echo "✅ Production deployment completed"
+        echo "🔗 Lambda ARN: $(aws lambda get-function --function-name bamvoo-prod-alexaSkill --query 'Configuration.FunctionArn' --output text)"
+        echo "🔗 API Gateway: https://$(aws apigateway get-rest-apis --query 'items[?name==`bamvoo-prod`].id' --output text).execute-api.us-east-1.amazonaws.com/prod"
+
+  notify:
+    name: 📢 Notify
+    runs-on: ubuntu-latest
+    needs: [deploy-staging, deploy-production]
+    if: always()
+    
+    steps:
+    - name: 📢 Deployment notification
+      run: |
+        echo "🚀 BamVoo deployment completed!"
+        echo "Repository: ${{ github.repository }}"
+        echo "Branch: ${{ github.ref_name }}"
+        echo "Status: ${{ job.status }}"
+      if: always() 

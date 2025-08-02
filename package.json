@@ -1,0 +1,33 @@
+{
+  "name": "bamvoo",
+  "version": "1.0.0",
+  "description": "BamVoo: Alexa skill for monitoring Bambu Lab printers via OctoEverywhere",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "test:local": "node test-local.js",
+    "build": "echo 'Build completed'",
+    "deploy": "ask deploy",
+    "start": "node test-local.js"
+  },
+  "dependencies": {
+    "ask-sdk-core": "^2.11.0",
+    "ask-sdk-model": "^1.18.0",
+    "ask-sdk-dynamodb-persistence-adapter": "^2.11.0",
+    "axios": "^1.6.0",
+    "moment": "^2.29.4"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "ask-cli": "^2.25.0"
+  },
+  "keywords": [
+    "alexa",
+    "skill",
+    "bambu",
+    "3d-printer",
+    "octoeverywhere"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+} 

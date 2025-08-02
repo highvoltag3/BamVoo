@@ -1,0 +1,201 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "bamvoo",
+      "intents": [
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": []
+        },
+        {
+          "name": "GetPrintersIntent",
+          "samples": [
+            "check my printers",
+            "list my printers",
+            "what printers do I have",
+            "show my printers",
+            "get my printers",
+            "check printers",
+            "list printers",
+            "what printers are available",
+            "show printers",
+            "get printers"
+          ]
+        },
+        {
+          "name": "PrinterSelectionIntent",
+          "slots": [
+            {
+              "name": "PrinterName",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "samples": [
+            "{PrinterName}",
+            "my {PrinterName}",
+            "the {PrinterName}",
+            "check {PrinterName}",
+            "use {PrinterName}",
+            "select {PrinterName}",
+            "I want {PrinterName}",
+            "let me check {PrinterName}",
+            "show me {PrinterName}",
+            "get {PrinterName}"
+          ]
+        },
+        {
+          "name": "GetPrinterStatusIntent",
+          "samples": [
+            "what is {PrinterName} doing",
+            "what's {PrinterName} doing",
+            "what is {PrinterName} doing right now",
+            "what's {PrinterName} doing right now",
+            "is {PrinterName} printing",
+            "what is the status of {PrinterName}",
+            "what's the status of {PrinterName}",
+            "how is {PrinterName}",
+            "what's {PrinterName} status",
+            "check {PrinterName} status",
+            "get {PrinterName} status",
+            "tell me about {PrinterName}",
+            "what's happening with {PrinterName}",
+            "what is {PrinterName} up to",
+            "what's {PrinterName} up to",
+            "check the status",
+            "what's the status",
+            "what is the status",
+            "how is my printer",
+            "what's my printer doing",
+            "what is my printer doing",
+            "is my printer printing",
+            "what's the printer status",
+            "what is the printer status",
+            "check printer status",
+            "get printer status",
+            "tell me about my printer",
+            "what's happening with my printer",
+            "what is my printer up to",
+            "what's my printer up to"
+          ]
+        },
+        {
+          "name": "GetPrintProgressIntent",
+          "samples": [
+            "how far along is {PrinterName}",
+            "how far along is {PrinterName} printing",
+            "what's the progress on {PrinterName}",
+            "what is the progress on {PrinterName}",
+            "how much progress has {PrinterName} made",
+            "what percentage is {PrinterName}",
+            "how complete is {PrinterName}",
+            "what percent is {PrinterName}",
+            "how far is {PrinterName}",
+            "progress on {PrinterName}",
+            "check progress on {PrinterName}",
+            "get progress on {PrinterName}",
+            "how far along is my printer",
+            "how far along is my printer printing",
+            "what's the progress on my printer",
+            "what is the progress on my printer",
+            "how much progress has my printer made",
+            "what percentage is my printer",
+            "how complete is my printer",
+            "what percent is my printer",
+            "how far is my printer",
+            "progress on my printer",
+            "check progress on my printer",
+            "get progress on my printer",
+            "how far along",
+            "what's the progress",
+            "what is the progress",
+            "how much progress",
+            "what percentage",
+            "how complete",
+            "what percent",
+            "how far",
+            "progress",
+            "check progress",
+            "get progress"
+          ]
+        },
+        {
+          "name": "GetTimeRemainingIntent",
+          "samples": [
+            "how much time is left on {PrinterName}",
+            "how much time does {PrinterName} have left",
+            "when will {PrinterName} be done",
+            "when will {PrinterName} finish",
+            "how long until {PrinterName} is done",
+            "how long until {PrinterName} finishes",
+            "time remaining on {PrinterName}",
+            "time left on {PrinterName}",
+            "how much time remaining on {PrinterName}",
+            "how much time left on {PrinterName}",
+            "when is {PrinterName} done",
+            "when does {PrinterName} finish",
+            "how much time is left on my printer",
+            "how much time does my printer have left",
+            "when will my printer be done",
+            "when will my printer finish",
+            "how long until my printer is done",
+            "how long until my printer finishes",
+            "time remaining on my printer",
+            "time left on my printer",
+            "how much time remaining on my printer",
+            "how much time left on my printer",
+            "when is my printer done",
+            "when does my printer finish",
+            "how much time is left",
+            "how much time remaining",
+            "time remaining",
+            "time left",
+            "when will it be done",
+            "when will it finish",
+            "how long until done",
+            "how long until finished",
+            "when is it done",
+            "when does it finish"
+          ]
+        },
+        {
+          "name": "GetWebcamSnapshotIntent",
+          "samples": [
+            "show me a snapshot from {PrinterName}",
+            "take a picture of {PrinterName}",
+            "get a snapshot from {PrinterName}",
+            "show me {PrinterName}",
+            "picture of {PrinterName}",
+            "snapshot of {PrinterName}",
+            "camera view of {PrinterName}",
+            "webcam view of {PrinterName}",
+            "show me a snapshot from my printer",
+            "take a picture of my printer",
+            "get a snapshot from my printer",
+            "show me my printer",
+            "picture of my printer",
+            "snapshot of my printer",
+            "camera view of my printer",
+            "webcam view of my printer",
+            "show me a snapshot",
+            "take a picture",
+            "get a snapshot",
+            "show me the printer",
+            "picture",
+            "snapshot",
+            "camera view",
+            "webcam view"
+          ]
+        }
+      ],
+      "types": []
+    }
+  }
+} 

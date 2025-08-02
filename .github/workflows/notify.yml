@@ -1,0 +1,47 @@
+name: 📢 Deployment Notifications
+
+on:
+  workflow_run:
+    workflows: ["BamVoo CI/CD Pipeline"]
+    types: [completed]
+
+jobs:
+  notify:
+    name: 📢 Notify Team
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion != 'skipped' }}
+    
+    steps:
+    - name: 📢 Slack notification
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ github.event.workflow_run.conclusion }}
+        channel: '#deployments'
+        webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+        custom_payload: |
+          {
+            "text": "BamVoo deployment ${{ github.event.workflow_run.conclusion }}",
+            "attachments": [{
+              "color": "${{ github.event.workflow_run.conclusion == 'success' && 'good' || 'danger' }}",
+              "fields": [{
+                "title": "Repository",
+                "value": "${{ github.repository }}",
+                "short": true
+              }, {
+                "title": "Branch",
+                "value": "${{ github.event.workflow_run.head_branch }}",
+                "short": true
+              }, {
+                "title": "Commit",
+                "value": "${{ github.event.workflow_run.head_sha }}",
+                "short": true
+              }]
+            }]
+          }
+      if: ${{ secrets.SLACK_WEBHOOK_URL != '' }}
+      
+    - name: 📢 Discord notification
+      uses: sarisia/actions-status-discord@v1
+      with:
+        webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      if: ${{ secrets.DISCORD_WEBHOOK_URL != '' }} 
